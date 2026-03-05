@@ -1,0 +1,53 @@
+let form = document.getElementById("converterForm");
+let amount = document.getElementById("amount");
+let fromCurrency = document.getElementById("fromCurrency");
+let toCurrency = document.getElementById("toCurrency");
+let convertedAmount = document.getElementById("convertedAmount");
+let loading = document.querySelector(".loading");
+const result = document.querySelector(".result");
+const error = document.querySelector(".error");
+
+const API_URL = "https://api.exchangerate-api.com/v4/latest/" 
+
+
+async function convertMoney(){
+
+    loading.style.display = "block";
+    error.style.display = "none";
+    result.style.display = "none";
+    
+    //tentar acessar o servidor
+    try{
+        const response = await fetch(API_URL + fromCurrency.value);
+        const data = await response.json();
+
+        let rate = data.rates[toCurrency.value];
+        let convertedValue = (amount.value * rate).toFixed(2);
+
+        convertedAmount.value = convertedValue;
+        result.style.display = "block";
+
+        result.innerHTML = `
+        <div style = "font-size: 1.4rem;">
+            ${amount.value} ${fromCurrency.value} = ${convertedAmount.value} ${toCurrency.value}
+        </div>
+        <div style = "font-size: 0.9rem; opacity: 0.8; margin-top: 10px;">
+            Taxa: 1 ${fromCurrency.value} = ${rate} ${toCurrency.value}
+        </div>
+        
+        `
+
+
+    }catch(err){
+        error.style.display = "block";
+        error.innerHTML = "Falha ao converter moeda! Tenta novamente";
+    }
+
+    loading.style.display = "none";
+}
+
+form.addEventListener("submit", function(event){ //Fica "escutando" o formulário até ele ser submitido(submit), e então ele chama a função(event)
+    event.preventDefault(); //Não deixa sumir o conteúdo do console
+    convertMoney();
+})
+     
